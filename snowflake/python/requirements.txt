@@ -1,0 +1,4 @@
+pandas==1.4.2
+pyarrow
+sqlalchemy
+clickhouse-sqlalchemy
