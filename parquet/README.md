@@ -16,11 +16,10 @@ Configure Python and create a virtual environment. This is tested with
 Python 3.6.9 but should work for other versions. 
 
 ```
-cd python
 python3 -m venv .venv
 . .venv/bin/activate
 pip install --upgrade pip
-pip install -r install.txt
+pip install -r requirements.txt
 ```
 
 ## Set environment
