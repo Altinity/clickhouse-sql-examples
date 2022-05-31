@@ -99,7 +99,7 @@ def process():
     print("CREATE TABLE IF NOT EXISTS {0} (".format(table_name))
     for ch_column in ch_columns[0:-1]:
         print("  " + ch_column + ",")
-    print(ch_columns[-1])
+    print("  " + ch_columns[-1])
     print(")")
     print("Engine=MergeTree()")
     print("PARTITION BY tuple()")
@@ -115,7 +115,7 @@ def process():
         AWS_REGION, S3_DATASET_PATH)
     print("INSERT INTO {0}".format(table_name))
     print("SELECT *")
-    print("FROM s3('{0}', {1}".format(s3_path_for_ch, aws_credentials))
+    print("FROM s3('{0}', '{1}'".format(s3_path_for_ch, aws_credentials))
     print("Parquet,".format(s3_path_for_ch))
     print("'", end='')
     for ch_column in ch_columns[0:-1]:
