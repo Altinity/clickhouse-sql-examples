@@ -1,5 +1,7 @@
 SET max_insert_threads=16;
 
+SET max_threads=16;
+
 -- Create temperature readings. 
 INSERT INTO test.readings_multi (sensor_id, sensor_type, time, msg_type, temperature)
 WITH
@@ -24,7 +26,7 @@ SELECT
        -50 + rand(2)%100, 0) 
   as temperature
 FROM numbers_mt(100000000000)
-SETTINGS max_block_size=100000000;
+SETTINGS max_block_size=1000000;
 
 -- Insert restart events. 
 INSERT INTO test.readings_multi (sensor_id, sensor_type, time, msg_type)
