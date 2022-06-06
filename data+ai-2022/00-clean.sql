@@ -1,4 +1,4 @@
 -- Clear and recreate database.
-DROP DATABASE IF EXISTS test;
+DROP DATABASE IF EXISTS billy;
 
-CREATE DATABASE test;
+CREATE DATABASE billy;

@@ -1,35 +1,24 @@
--- Unoptimized table. 
-CREATE TABLE IF NOT EXISTS readings (
-    sensor_id Int32,
-    sensor_type String,
-    location String,
-    time DateTime,
-    date ALIAS toDate(time),
-    reading Float32
-) Engine = MergeTree
-PARTITION BY toDate(time)
-ORDER BY (location, sensor_id, time);
-
--- Optimized table with LZ4. 
-CREATE TABLE IF NOT EXISTS readings_optimized_lz4 (
+-- Original schema from Alexander Zaitsev blog article. 
+CREATE TABLE IF NOT EXISTS billy.readings (
     sensor_id Int32 Codec(DoubleDelta, LZ4),
-    sensor_type LowCardinality(String) Codec(LZ4),
-    location LowCardinality(String) Codec(LZ4),
     time DateTime Codec(DoubleDelta, LZ4),
     date ALIAS toDate(time),
     temperature Decimal(5,2) Codec(T64, LZ4)
 ) Engine = MergeTree
 PARTITION BY toYYYYMM(time)
-ORDER BY (location, sensor_id, time);
+ORDER BY (sensor_id, time);
 
--- Optimized table with ZSTD. 
-CREATE TABLE IF NOT EXISTS readings_optimized_zstd (
-    sensor_id Int32 Codec(DoubleDelta, ZSTD(1)),
-    sensor_type LowCardinality(String) Codec(ZSTD(1)),
-    location LowCardinality(String) Codec(ZSTD(1)),
-    time DateTime Codec(DoubleDelta, ZSTD(1)),
-    date ALIAS toDate(time),
-    temperature Decimal(5,2) Codec(T64, ZSTD(1))
-) Engine = MergeTree
-PARTITION BY toYYYYMM(time)
-ORDER BY (location, sensor_id, time);
+CREATE MATERIALIZED VIEW IF NOT EXISTS billy.readings_daily(
+  sensor_id Int32 Codec(DoubleDelta, LZ4),
+  date Date Codec(DoubleDelta, LZ4),
+  temp_min SimpleAggregateFunction(min, Decimal(5,2)),
+  temp_max SimpleAggregateFunction(max, Decimal(5,2))
+) Engine = AggregatingMergeTree
+PARTITION BY toYYYYMM(date)
+ORDER BY (sensor_id, date)
+AS 
+SELECT sensor_id, date, 
+   min(temperature) as temp_min,
+   max(temperature) as temp_max
+FROM billy.readings
+GROUP BY sensor_id, date;
