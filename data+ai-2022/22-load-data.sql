@@ -2,6 +2,8 @@ SET max_insert_threads=16;
 
 SET max_threads=16;
 
+SET optimize_on_insert=0;
+
 -- Create temperature readings. 
 INSERT INTO test.readings_multi (sensor_id, sensor_type, time, msg_type, temperature)
 WITH
@@ -35,6 +37,7 @@ WITH
 SELECT sensor_id, sensor_type, time + 30, 'restart' as msg_type
 FROM test.readings_multi 
 WHERE time = min_time + (sensor_id * 3600)
+SETTINGS max_block_size = 1000;
 ;  
 
 -- Check bounds. 

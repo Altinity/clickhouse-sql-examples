@@ -1,3 +1,7 @@
+SET max_insert_threads=2;
+
+SET max_threads=2;
+
 -- Create unoptimized test data. 
 INSERT INTO readings_unopt (sensor_id, sensor_type, location, time, reading)
 WITH

@@ -1,4 +1,5 @@
-set max_insert_threads=16;
+set max_insert_threads=2;
+set max_threads=2;
 
 -- Copy from base table to optimized tables. 
 INSERT INTO readings_lz4
