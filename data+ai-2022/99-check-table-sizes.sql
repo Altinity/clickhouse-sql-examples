@@ -1,7 +1,9 @@
 -- Check table sizes. 
 SELECT 
-  database AS db, name, total_rows AS rows,
+  database AS db, name, 
+  total_bytes,
   formatReadableSize(total_bytes) AS size,
+  total_rows AS rows,
   round(total_bytes / rows, 2) AS row_size
 FROM system.tables 
 WHERE database = currentDatabase() and name LIKE '%readings%' 
