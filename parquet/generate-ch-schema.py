@@ -108,14 +108,14 @@ def process():
 
     # Generate INSERT with SELECT from S3 URL. 
     if AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
-        aws_credentials = "'{0}', {1},".format(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
+        aws_credentials = "'{0}', '{1}',".format(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
     else:
         aws_credentials = ""
     s3_path_for_ch = "https://s3.{0}.amazonaws.com/{1}/*.parquet".format(
         AWS_REGION, S3_DATASET_PATH)
     print("INSERT INTO {0}".format(table_name))
     print("SELECT *")
-    print("FROM s3('{0}', '{1}'".format(s3_path_for_ch, aws_credentials))
+    print("FROM s3('{0}', {1}".format(s3_path_for_ch, aws_credentials))
     print("Parquet,".format(s3_path_for_ch))
     print("'", end='')
     for ch_column in ch_columns[0:-1]:
