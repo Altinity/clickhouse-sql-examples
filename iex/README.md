@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Loads real-time stock quotes from the (IEX stock exchange)[https://en.wikipedia.org/wiki/IEX]
+Loads real-time stock quotes from the [IEX stock exchange](https://en.wikipedia.org/wiki/IEX)
 which as of the end of 2020 accounted for 2.57% of market share. 
 
 ## Prerequisites
@@ -29,4 +29,4 @@ Run `. env.sh` to set values.
 
 ## Load from IEX to ClickHouse
 
-`iex-02-run.sh`
+`./iex-02-run.sh`
