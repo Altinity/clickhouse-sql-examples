@@ -13,9 +13,9 @@ ALTER TABLE readings_multi_json
     DEFAULT JSONExtractString(json, 'firmware')
 ;
 
-ALTER TABLE readings_multi_json
-  ADD INDEX jsonbf_f1 firmware 
-    TYPE tokenbf_v1(8196, 3, 0) GRANULARITY 1
+-- ALTER TABLE readings_multi_json
+--   ADD INDEX jsonbf_f1 firmware 
+--     TYPE tokenbf_v1(8196, 3, 0) GRANULARITY 1
 ;
 
 ALTER TABLE readings_multi_json

@@ -111,7 +111,7 @@ def process():
         aws_credentials = "'{0}', '{1}',".format(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
     else:
         aws_credentials = ""
-    s3_path_for_ch = "https://s3.{0}.amazonaws.com/{1}/*.parquet".format(
+    s3_path_for_ch = "https://s3.{0}.amazonaws.com/{1}*.parquet".format(
         AWS_REGION, S3_DATASET_PATH)
     print("INSERT INTO {0}".format(table_name))
     print("SELECT *")

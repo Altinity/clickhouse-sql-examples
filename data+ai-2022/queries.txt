@@ -1,0 +1,64 @@
+-- Demo #1
+SELECT max(temperature)
+FROM test.readings_multi
+WHERE sensor_id = 2555 AND msg_type = 'reading';
+
+-- Demo #2
+SELECT sensor_id, max(temperature), argMax(date, temperature)
+FROM test.readings_multi
+WHERE sensor_id = 2555 AND msg_type = 'reading'
+GROUP BY sensor_id ;
+
+-- Demo #3
+SELECT sensor_id, max(temp_max), argMax(date, temp_max)
+FROM test.readings_multi_daily
+WHERE sensor_id = 2555 
+GROUP BY sensor_id;
+
+-- Demo #4
+SELECT sensor_id, max(temp_max) m, argMax(date, temp_max)
+FROM test.readings_multi_daily
+WHERE sensor_id = 2555 
+GROUP BY sensor_id ORDER BY m LIMIT 1
+
+-- Scratch. 
+SELECT min(temperature), max(temperature)
+FROM test.readings_multi
+WHERE sensor_id = 2555 AND msg_type = 'reading'
+GROUP BY date ORDER BY date DESC
+LIMIT 10
+SETTINGS min_bytes_to_use_direct_io = 1;
+
+SELECT sensor_id, time, msg_type 
+FROM test.readings_multi
+WHERE sensor_id = 2555 and msg_type = 'restart';
+
+SELECT sensor_id, reading_time, temp, reading_time - restart_time AS uptime
+
+FROM (
+WITH toDateTime('2019-04-17 11:00:00') as start_of_range
+SELECT
+    sensor_id, groupArrayIf(time, msg_type = 'reading') AS reading_time,
+    groupArrayIf(temperature, msg_type = 'reading') AS temp,
+    anyIf(time, msg_type = 'restart') AS restart_time
+FROM test.readings_multi rm
+WHERE (sensor_id = 2555)
+  AND time BETWEEN start_of_range AND start_of_range + 600
+GROUP BY sensor_id)
+ARRAY JOIN reading_time, temp
+
+-- How to get the latest restart.
+SELECT sensor_id, max(time), msg_type 
+FROM test.readings_multi
+WHERE sensor_id = 2555 and msg_type = 'restart';
+
+SELECT
+    date,
+    countIf(msg_type='reading') AS readings,
+    min(temperature, msg_type='reading') as min,
+    maxIf(temperature, msg_type='reading') as max
+FROM readings_multi_daily
+GROUP BY date ORDER BY date DESC
+LIMIT 10;
+
+SELECT count(distinct sensor_id) from readings_multi_daily

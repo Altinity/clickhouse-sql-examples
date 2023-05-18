@@ -21,7 +21,7 @@ ALTER TABLE readings_multi_json DROP INDEX jsonbf;
 
 -- Add Bloom filter index. 
 ALTER TABLE readings_multi_json
-   ADD INDEX jsonbf json TYPE tokenbf_v1(16384, 3, 0) GRANULARITY 1
+   ADD INDEX jsonbf json TYPE tokenbf_v1(32768, 3, 0) GRANULARITY 1
 ;
 
 -- Materialize it. 
