@@ -1,0 +1,16 @@
+# Storage class for EBS gp3 with 1000 MiB/sec throughput
+allowVolumeExpansion: true
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false"
+  name: gp3
+parameters:
+  fsType: ext4
+  type: gp3
+  throughput: "1000"
+  iops: "4000"
+provisioner: ebs.csi.aws.com
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer

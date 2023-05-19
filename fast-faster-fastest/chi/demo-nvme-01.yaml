@@ -1,0 +1,40 @@
+# ClickHouse using NVMe SSD locally attached storage on i3.4xlarge VM. 
+apiVersion: "clickhouse.altinity.com/v1"
+kind: "ClickHouseInstallation"
+metadata:
+  name: "nvme"
+spec:
+  configuration:
+    clusters:
+      - name: "ch"
+        layout:
+          replicas:
+          - templates:
+              podTemplate: replica-1
+          shardsCount: 1
+        templates:
+          volumeClaimTemplate: storage
+    users:
+      ioperf/networks/ip: "::/0"
+      ioperf/password: "oYx5yl;VI4vAYU"
+      ioperf/profile: "default"
+      ioperf/access_management: 1
+  templates:
+    podTemplates:
+      - name: replica-1
+        spec:
+          containers:
+          - name: clickhouse
+            image: altinity/clickhouse-server:22.8.15.25.altinitystable
+          nodeSelector:
+            node.kubernetes.io/instance-type: i3.4xlarge
+    volumeClaimTemplates:
+      - name: storage
+        # reclaimPolicy: Retain
+        spec:
+          storageClassName: fast-disks
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 500Gi
