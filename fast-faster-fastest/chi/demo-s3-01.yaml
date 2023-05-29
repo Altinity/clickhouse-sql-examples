@@ -1,0 +1,88 @@
+apiVersion: "clickhouse.altinity.com/v1"
+kind: "ClickHouseInstallation"
+metadata:
+  name: "s3"
+spec:
+  configuration:
+    clusters:
+      - name: "ch"
+        layout:
+          replicas:
+          - templates:
+              podTemplate: replica-1
+              volumeClaimTemplate: storage
+          shardsCount: 1
+        templates:
+    files:
+      config.d/ed_storage.xml: |
+        <clickhouse>
+          <storage_configuration>
+            <disks>
+              <s3_disk>
+                <type>s3</type>
+                <endpoint from_env="AWS_S3_DISK_URL"/>
+                <use_environment_credentials>1</use_environment_credentials>
+                <metadata_path>/var/lib/clickhouse/disks/s3_disk/</metadata_path>
+              </s3_disk>
+              <s3_cache>
+                <type>cache</type>
+                <disk>s3_disk</disk>
+                <path>/var/lib/clickhouse/s3_cache/cache/</path>
+                <max_size>500Gi</max_size>
+                <cache_on_write_operations>1</cache_on_write_operations>
+              </s3_cache>
+            </disks>
+            <policies>
+              <s3_with_cache>
+                <volumes>
+                  <main>
+                    <disk>s3_cache</disk>
+                  </main>
+                </volumes>
+              </s3_with_cache>
+              <s3_direct>
+                <volumes>
+                  <main>
+                    <disk>s3_disk</disk>
+                  </main>
+                </volumes>
+              </s3_direct>
+            </policies>
+          </storage_configuration>
+        </clickhouse>
+  templates:
+    podTemplates:
+      - name: replica-1
+        spec:
+          containers:
+          - name: clickhouse
+            image: clickhouse/clickhouse-server:23.3.2.37
+                - name: DB_USER
+            env:
+            - name: AWS_S3_DISK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: s3-credentials
+                  key: AWS_SESSION_KEY_ID
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: s3-credentials
+                  key: AWS_ACCESS_KEY_ID
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: s3-credentials
+                  key: AWS_SECRET_ACCESS_KEY
+          nodeSelector:
+            node.kubernetes.io/instance-type: i3.4xlarge
+    volumeClaimTemplates:
+      - name: storage
+        # reclaimPolicy: Retain
+        spec:
+          storageClassName: fast-disks
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1000Gi
