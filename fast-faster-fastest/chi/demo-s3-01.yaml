@@ -57,7 +57,6 @@ spec:
           containers:
           - name: clickhouse
             image: clickhouse/clickhouse-server:23.3.2.37
-                - name: DB_USER
             env:
             - name: AWS_S3_DISK_URL
               valueFrom:
