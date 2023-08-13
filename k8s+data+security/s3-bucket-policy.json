@@ -1,0 +1,13 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "s3:*",
+      "Effect": "Allow",
+      "Resource": [
+         "arn:aws:s3:::rhodges-us-west-2-playground-1",
+         "arn:aws:s3:::rhodges-us-west-2-playground-1/*"
+      ]
+    }
+  ]
+}

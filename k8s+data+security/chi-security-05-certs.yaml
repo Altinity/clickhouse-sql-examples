@@ -1,4 +1,3 @@
-# ClickHouse using default storage class. 
 apiVersion: "clickhouse.altinity.com/v1"
 kind: "ClickHouseInstallation"
 metadata:
@@ -8,14 +7,14 @@ spec:
     clusters:
       - name: "ch"
         layout:
-          replicas: 1
+          replicasCount: 1
           shardsCount: 1
         templates:
           volumeClaimTemplate: storage
           podTemplate: replica
     users:
       root/networks/ip: "::/0"
-      root/password: "oYx5yl;VI4vAYU"
+      root/k8s_secret_password_sha256_hex: db-passwords/password_sha256_hex
       root/profile: "default"
       root/access_management: 1
   templates:
@@ -25,12 +24,24 @@ spec:
           containers:
           - name: clickhouse
             image: altinity/clickhouse-server:23.3.8.22.altinitystable
+            volumeMounts:
+            - name: server-crt-volume
+              mountPath: "/opt/certs/server.crt"
+              subPath: server.crt
+            - name: server-crt-volume
+              mountPath: "/opt/certs/server.key"
+              subPath: server.key
+          volumes:
+            - name: server-crt-volume
+              secret:
+                secretName: server-crt
     volumeClaimTemplates:
       - name: storage
         reclaimPolicy: Retain
         spec:
+          storageClassName: encrypted-gp3
           accessModes:
             - ReadWriteOnce
           resources:
             requests:
-              storage: 10Gi
+              storage: 50Gi
