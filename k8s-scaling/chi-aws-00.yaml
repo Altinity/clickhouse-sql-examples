@@ -2,7 +2,7 @@
 apiVersion: "clickhouse.altinity.com/v1"
 kind: "ClickHouseInstallation"
 metadata:
-  name: "stop"
+  name: "aws"
 spec:
   configuration:
     clusters:
@@ -16,10 +16,15 @@ spec:
   templates:
     podTemplates:
       - name: replica
+        podDistribution:
+          - type: ClickHouseAntiAffinity
+            scope: ClickHouseInstallation
         spec:
           containers:
           - name: clickhouse
             image: altinity/clickhouse-server:23.3.8.22.altinitystable
+          nodeSelector: 
+            node.kubernetes.io/instance-type: m6i.large
     volumeClaimTemplates:
       - name: storage
         reclaimPolicy: Retain

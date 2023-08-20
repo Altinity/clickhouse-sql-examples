@@ -1,0 +1,32 @@
+# ClickHouse using default storage class. 
+apiVersion: "clickhouse.altinity.com/v1"
+kind: "ClickHouseInstallation"
+metadata:
+  name: "generic"
+spec:
+  stop: "yes"
+  configuration:
+    clusters:
+      - name: "ch"
+        layout:
+          replicasCount: 1
+          shardsCount: 1
+        templates:
+          volumeClaimTemplate: storage
+          podTemplate: replica
+  templates:
+    podTemplates:
+      - name: replica
+        spec:
+          containers:
+          - name: clickhouse
+            image: altinity/clickhouse-server:23.3.8.22.altinitystable
+    volumeClaimTemplates:
+      - name: storage
+        reclaimPolicy: Retain
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 10Gi

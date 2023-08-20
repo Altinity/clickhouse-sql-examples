@@ -1,0 +1,15 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: ubuntu-altinity-cloud-anywhere-demo
+  region: us-west-2
+
+managedNodeGroups:
+  - name: m6i-large-workers
+    labels: { role: workers }
+    instanceType: m6i.large
+    minSize: 0
+    maxSize: 5
+    volumeSize: 25
+    privateNetworking: true

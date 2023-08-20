@@ -2,9 +2,9 @@
 apiVersion: "clickhouse.altinity.com/v1"
 kind: "ClickHouseInstallation"
 metadata:
-  name: "stop"
+  name: "generic"
 spec:
-  stop: "yes"
+  stop: "no"
   configuration:
     clusters:
       - name: "ch"
