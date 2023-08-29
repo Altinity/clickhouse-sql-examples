@@ -1,0 +1,8 @@
+<clickhouse>
+  <s3>
+    <data-lake>
+      <endpoint from_env="AWS_S3_DATALAKE_URL"/>
+      <use_environment_credentials>1</use_environment_credentials>
+    </data-lake>
+  </s3>
+</clickhouse>

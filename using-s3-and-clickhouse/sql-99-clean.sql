@@ -1,0 +1,7 @@
+DROP TABLE IF EXISTS test;
+
+DROP TABLE IF EXISTS test_s3_direct;
+
+DROP TABLE IF EXISTS test_s3_cached;
+
+DROP TABLE IF EXISTS test_s3_tiered;

@@ -14,6 +14,15 @@ spec:
           shardsCount: 1
         templates:
     files:
+      config.d/ed_s3.xml: |
+        <clickhouse>
+          <s3>
+            <data-lake>
+              <endpoint from_env="AWS_S3_DATALAKE_URL"/>
+              <use_environment_credentials>1</use_environment_credentials>
+            </data-lake>
+          </s3>
+        </clickhouse>
       config.d/ed_storage.xml: |
         <clickhouse>
           <storage_configuration>
@@ -22,24 +31,16 @@ spec:
                 <type>s3</type>
                 <endpoint from_env="AWS_S3_DISK_URL"/>
                 <use_environment_credentials>1</use_environment_credentials>
-                <metadata_path>/var/lib/clickhouse/disks/s3_disk/</metadata_path>
               </s3_disk>
               <s3_cache>
                 <type>cache</type>
                 <disk>s3_disk</disk>
                 <path>/var/lib/clickhouse/s3_cache/cache/</path>
-                <max_size>500Gi</max_size>
+                <max_size>100Gi</max_size>
                 <cache_on_write_operations>1</cache_on_write_operations>
               </s3_cache>
             </disks>
             <policies>
-              <s3_cached>
-                <volumes>
-                  <main>
-                    <disk>s3_cache</disk>
-                  </main>
-                </volumes>
-              </s3_cached>
               <s3_direct>
                 <volumes>
                   <main>
@@ -47,6 +48,27 @@ spec:
                   </main>
                 </volumes>
               </s3_direct>
+              <s3_cached>
+                <volumes>
+                  <main>
+                    <disk>s3_cache</disk>
+                  </main>
+                </volumes>
+              </s3_cached>
+              <s3_tiered>
+                <volumes>
+                  <default>
+                    <disk>default</disk>
+                  </default>
+                  <s3_cached>
+                      <disk>s3_cache</disk>
+                      <!-- 
+                      <prefer_not_to_merge>true</prefer_not_to_merge>
+                      <perform_ttl_move_on_insert>false</perform_ttl_move_on_insert>
+                      -->
+                  </s3_cached>
+                </volumes>
+              </s3_tiered>
             </policies>
           </storage_configuration>
         </clickhouse>
@@ -54,15 +76,22 @@ spec:
     podTemplates:
       - name: replica-1
         spec:
+          nodeSelector:
+            node.kubernetes.io/instance-type: m6i.2xlarge
           containers:
           - name: clickhouse
-            image: clickhouse/clickhouse-server:23.3.2.37
+            image: clickhouse/clickhouse-server:23.7.4.5
             env:
             - name: AWS_S3_DISK_URL
               valueFrom:
                 secretKeyRef:
                   name: s3-credentials
                   key: AWS_S3_DISK_URL
+            - name: AWS_S3_DATALAKE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: s3-credentials
+                  key: AWS_S3_DATALAKE_URL
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
@@ -77,8 +106,9 @@ spec:
       - name: storage
         # reclaimPolicy: Retain
         spec:
+          storageClassName: gp3
           accessModes:
             - ReadWriteOnce
           resources:
             requests:
-              storage: 20Gi
+              storage: 200Gi
