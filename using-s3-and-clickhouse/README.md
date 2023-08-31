@@ -25,9 +25,9 @@ kubectl apply -f demo-s3-01.yaml
 After server is started, run `port-forward.sh` to make ports 
 accessible. 
 
-## S3 Tables
+## S3 Tables and Benchmark Scripts
 
-Use the SQL scripts to create tables. 
+Use the SQL scripts to create tables and run benchmark scripts. 
 ```
 alias cc-batch='clickhouse-client -m -n --verbose -t --echo -f Pretty'
 # Single server scripts. 
@@ -38,9 +38,21 @@ cc-batch < sql-03-statistics.sql
 cc-batch < sql-04-benchmark.sql
 # Parquet files need to substitute values of EXT_AWS_S3_URL.
 (cat sql-06a-create-parquet-tables.sql |envsubst) |cc-batch
-(cat sql-06b-benchmark-parquet-tables.sql |envsubst) |cc-batch
+(cat sql-06b-insert-parquet-data.sql |envsubst) |cc-batch
+(cat sql-06c-benchmark-parquet-tables.sql |envsubst) |cc-batch
 
-# Clustered server scripts. Require a running ZooKeeper. 
+## Replicated Cluster
+
+Set up replicated cluster. Example requires a running ZooKeeper. 
+```
+kubectl delete chi/demo
+kubectl apply -f demo2-s3-01.yaml
+```
+
+Run test scripts. sql-03 and sql-05 scripts run against replicated server
+without change. 
+```
+# Clustered server scripts. 
 cc-batch < sql-11-create-s3-replicated.sql  
 cc-batch < sql-12-insert-data-replicated.sql  
 cc-batch < sql-14-benchmark.sql
