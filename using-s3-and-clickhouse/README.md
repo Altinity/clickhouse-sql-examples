@@ -30,17 +30,28 @@ accessible.
 Use the SQL scripts to create tables. 
 ```
 alias cc-batch='clickhouse-client -m -n --verbose -t --echo -f Pretty'
+# Single server scripts. 
 cc-batch < sql-00-check-liveness.sql
 cc-batch < sql-01-create-s3-tables.sql
 cc-batch < sql-02-insert-data.sql
 cc-batch < sql-03-statistics.sql
 cc-batch < sql-04-benchmark.sql
-# Last two need to substitute values of EXT_AWS_S3_URL.
+# Parquet files need to substitute values of EXT_AWS_S3_URL.
 (cat sql-06a-create-parquet-tables.sql |envsubst) |cc-batch
 (cat sql-06b-benchmark-parquet-tables.sql |envsubst) |cc-batch
+
+# Clustered server scripts. Require a running ZooKeeper. 
+cc-batch < sql-11-create-s3-replicated.sql  
+cc-batch < sql-12-insert-data-replicated.sql  
+cc-batch < sql-14-benchmark.sql
 ```
 
 ## Metrics and Counters for S3
 
 There are lots of them. Look in sql-05-telemetry for a sample of 
 how to monitor S3 performance. 
+
+Count the actual bytes stored in S3 with a command like the following:
+```
+aws s3 ls --summarize --human-readable --recursive s3://bucket/clickhouse/s3/mergetree/
+```

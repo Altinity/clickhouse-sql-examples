@@ -1,19 +1,28 @@
 apiVersion: "clickhouse.altinity.com/v1"
 kind: "ClickHouseInstallation"
 metadata:
-  name: "demo"
+  name: "demo2"
 spec:
   configuration:
     clusters:
       - name: "s3"
         layout:
-          replicas:
-          - templates:
-              podTemplate: replica-1
-              volumeClaimTemplate: storage
+          replicasCount: 1
           shardsCount: 1
         templates:
+          podTemplate: replica-1
+          volumeClaimTemplate: storage
+    zookeeper:
+        nodes:
+        - host: zookeeper
+          port: 2181
     files:
+      config.d/ed_zero_copy.xml: |
+        <clickhouse>
+           <merge_tree>
+             <allow_remote_fs_zero_copy_replication>true</allow_remote_fs_zero_copy_replication>
+           </merge_tree>
+        </clickhouse>
       config.d/ed_s3.xml: |
         <clickhouse>
           <s3>
@@ -78,7 +87,7 @@ spec:
       - name: replica-1
         spec:
           nodeSelector:
-            node.kubernetes.io/instance-type: m6i.2xlarge
+            node.kubernetes.io/instance-type: m6i.large
           containers:
           - name: clickhouse
             image: clickhouse/clickhouse-server:23.7.4.5
