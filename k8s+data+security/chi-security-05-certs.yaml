@@ -6,17 +6,56 @@ spec:
   configuration:
     clusters:
       - name: "ch"
+        secure: "yes"
+        secret:
+          auto: "yes"
         layout:
-          replicasCount: 1
+          replicasCount: 2
           shardsCount: 1
         templates:
           volumeClaimTemplate: storage
           podTemplate: replica
+    settings:
+      tcp_port: 9000 # keep for localhost
+      tcp_port_secure: 9440
+      https_port: 8443
+    zookeeper:
+        nodes:
+        - host: zookeeper
     users:
       root/networks/ip: "::/0"
       root/k8s_secret_password_sha256_hex: db-passwords/password_sha256_hex
       root/profile: "default"
       root/access_management: 1
+    files:
+      openssl.xml: |
+          <clickhouse>
+            <openSSL>
+              <server>
+                <loadDefaultCAFile>false</loadDefaultCAFile>
+                <caConfig>/opt/certs/ca.crt</caConfig>
+                <certificateFile>/opt/certs/server.crt</certificateFile>
+                <privateKeyFile>/opt/certs/server.key</privateKeyFile>
+                <verificationMode>relaxed</verificationMode>
+                <loadDefaultCAFile>true</loadDefaultCAFile>
+                <cacheSessions>true</cacheSessions>
+                <disableProtocols>sslv2,sslv3</disableProtocols>
+                <preferServerCiphers>true</preferServerCiphers>
+              </server>
+              <client>
+                <loadDefaultCAFile>false</loadDefaultCAFile>
+                <caConfig>/opt/certs/ca.crt</caConfig>
+                <loadDefaultCAFile>true</loadDefaultCAFile>
+                <cacheSessions>true</cacheSessions>
+                <disableProtocols>sslv2,sslv3</disableProtocols>
+                <preferServerCiphers>true</preferServerCiphers>
+                <verificationMode>relaxed</verificationMode>
+                <invalidCertificateHandler>
+                    <name>AcceptCertificateHandler</name>
+                </invalidCertificateHandler>
+              </client>
+            </openSSL>
+          </clickhouse>
   templates:
     podTemplates:
       - name: replica
@@ -25,6 +64,9 @@ spec:
           - name: clickhouse
             image: altinity/clickhouse-server:23.3.8.22.altinitystable
             volumeMounts:
+            - name: server-crt-volume
+              mountPath: "/opt/certs/ca.crt"
+              subPath: ca.crt
             - name: server-crt-volume
               mountPath: "/opt/certs/server.crt"
               subPath: server.crt
