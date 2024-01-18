@@ -15,10 +15,10 @@ spec:
         templates:
           volumeClaimTemplate: storage
     users:
-      ioperf/networks/ip: "::/0"
-      ioperf/password: "oYx5yl;VI4vAYU"
-      ioperf/profile: "default"
-      ioperf/access_management: 1
+      kioperf/networks/ip: "::/0"
+      kioperf/password: "oYx5yl;VI4vAYU"
+      kioperf/profile: "default"
+      kioperf/access_management: 1
   templates:
     podTemplates:
       - name: replica-1
