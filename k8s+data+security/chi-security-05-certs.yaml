@@ -23,8 +23,9 @@ spec:
         nodes:
         - host: zookeeper
     users:
+      default/password_sha256_hex: 53336a676c64c1396553b2b7c92f38126768827c93b64d9142069c10eda7a721
       root/networks/ip: "::/0"
-      root/k8s_secret_password_sha256_hex: db-passwords/password_sha256_hex
+      root/password_sha256_hex: 53336a676c64c1396553b2b7c92f38126768827c93b64d9142069c10eda7a721
       root/profile: "default"
       root/access_management: 1
     files:

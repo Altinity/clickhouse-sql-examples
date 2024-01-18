@@ -1,17 +1,9 @@
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  annotations:
-    eks.amazonaws.com/role-arn: arn:aws:iam::<account-id>:role/<role-name>
-  name: s3-iam
----
-
 apiVersion: "clickhouse.altinity.com/v1"
 kind: "ClickHouseInstallation"
 metadata:
   name: "secure"
 spec:
+  taskID: "1"
   configuration:
     clusters:
       - name: "ch"
@@ -41,12 +33,21 @@ spec:
   templates:
     podTemplates:
       - name: replica
-spec:
-  serviceAccountName: s3-iam
-  containers:
-  - name: clickhouse
-    image: altinity/clickhouse-server:23.3.8.22.altinitystable
-
+        spec:
+          containers:
+          - name: clickhouse
+            image: altinity/clickhouse-server:23.3.8.22.altinitystable
+            env:
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: s3-credentials
+                  key: AWS_ACCESS_KEY_ID
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: s3-credentials
+                  key: AWS_SECRET_ACCESS_KEY
     volumeClaimTemplates:
       - name: storage
         reclaimPolicy: Retain
@@ -56,4 +57,3 @@ spec:
           resources:
             requests:
               storage: 10Gi
-
