@@ -3,7 +3,7 @@ kind: "ClickHouseInstallation"
 metadata:
   name: "secure"
 spec:
-  taskID: "1"
+  taskID: "2"
   configuration:
     clusters:
       - name: "ch"
@@ -20,13 +20,17 @@ spec:
       root/profile: "default"
       root/access_management: 1
     settings:
-      s3/my_bucket/endpoint: "https://my-bucket.s3.amazonaws.com/sample/"
+      s3/my_bucket/endpoint: 
+        valueFrom:
+          secretKeyRef:
+            name: s3-credentials
+            key: AWS_S3_ENDPOINT
       s3/my_bucket/secret_access_key:
         valueFrom:
           secretKeyRef:
             name: s3-credentials
             key: AWS_SECRET_ACCESS_KEY
-      s3/my_bucket/access_key:
+      s3/my_bucket/access_key_id:
         valueFrom:
           secretKeyRef:
             name: s3-credentials
@@ -37,18 +41,7 @@ spec:
         spec:
           containers:
           - name: clickhouse
-            image: altinity/clickhouse-server:23.3.8.22.altinitystable
-            env:
-            - name: AWS_ACCESS_KEY_ID
-              valueFrom:
-                secretKeyRef:
-                  name: s3-credentials
-                  key: AWS_ACCESS_KEY_ID
-            - name: AWS_SECRET_ACCESS_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: s3-credentials
-                  key: AWS_SECRET_ACCESS_KEY
+            image: altinity/clickhouse-server:23.8.8.21.altinitystable
     volumeClaimTemplates:
       - name: storage
         reclaimPolicy: Retain

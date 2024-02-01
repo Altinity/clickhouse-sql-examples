@@ -12,6 +12,7 @@ metadata:
   name: s3-credentials
 type: Opaque
 stringData:
+  AWS_S3_ENDPOINT: $AWS_S3_ENDPOINT
   AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
   AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
 END

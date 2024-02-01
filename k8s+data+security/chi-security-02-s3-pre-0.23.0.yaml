@@ -24,9 +24,11 @@ spec:
         <clickhouse>
           <s3>
             <playground>
-              <endpoint>https://rhodges-us-west-2-playground-1.s3.amazonaws.com/k8s/security/</endpoint>
+              <endpoint from_env="MY_AWS_S3_ENDPOINT"/>
+              <secret_access_key from_env="MY_AWS_SECRET_ACCESS_KEY"/>
+              <access_key_id from_env="MY_AWS_ACCESS_KEY_ID"/>
               <region>us-west-2</region>
-              <use_environment_credentials>true</use_environment_credentials> 
+              <use_environment_credentials>false</use_environment_credentials>
             </playground>
           </s3>
         </clickhouse>
@@ -36,14 +38,19 @@ spec:
         spec:
           containers:
           - name: clickhouse
-            image: altinity/clickhouse-server:23.3.8.22.altinitystable
+            image: altinity/clickhouse-server:23.8.8.21.altinitystable
             env:
-            - name: AWS_ACCESS_KEY_ID
+            - name: MY_AWS_S3_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: s3-credentials
+                  key: AWS_S3_ENDPOINT
+            - name: MY_AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
                   name: s3-credentials
                   key: AWS_ACCESS_KEY_ID
-            - name: AWS_SECRET_ACCESS_KEY
+            - name: MY_AWS_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
                   name: s3-credentials
