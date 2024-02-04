@@ -2,6 +2,10 @@
 
 ## Setting up in ClickHouse
 
+These are demo script that run on a home dev server. You'll need to 
+change credentials, use TLS, etc., to deploy them. I hope you find the
+samples useful. 
+
 ```
 # Adjust credentials in script. 
 ./load_schema.sh
@@ -37,3 +41,13 @@ Install and run stress (`sudo apt install stress`) to eat up memory.
 ```
 stress -m 4 --vm-bytes 4G
 ```
+
+## Using Fluent Bit
+
+You can also use Fluenti Bit to collect data. Here's how to try it out. 
+
+1. Install [Fluent Bit](https://docs.fluentbit.io/manual/installation/getting-started-with-fluent-bit). 
+2. Run load_fluentbit_schema.sh to create a table for Fluent Bit CPU data. 
+3. Start Fluent Bit: `fluentbit -c fluent-http.conf`
+
+Don't for get to modify the credentials and ClickHouse server location in fluent-http.conf. 
