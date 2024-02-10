@@ -29,29 +29,14 @@ spec:
       root/profile: "default"
       root/access_management: 1
     files:
-      ca.crt:
-        valueFrom:
-          secretKeyRef:
-            name: server-crt
-            key: ca.crt
-      server.crt:
-        valueFrom:
-          secretKeyRef:
-            name: server-crt
-            key: server.crt
-      server.key:
-        valueFrom:
-          secretKeyRef:
-            name: server-crt
-            key: server.key
       openssl.xml: |
           <clickhouse>
             <openSSL>
               <server>
                 <loadDefaultCAFile>false</loadDefaultCAFile>
-                <caConfig>/etc/clickhouse-server/secrets.d/ca.crt/server-crt/ca.crt</caConfig>
-                <certificateFile>/etc/clickhouse-server/secrets.d/server.crt/server-crt/server.crt</certificateFile>
-                <privateKeyFile>/etc/clickhouse-server/secrets.d/server.key/server-crt/server.key</privateKeyFile>
+                <caConfig>/opt/certs/ca.crt</caConfig>
+                <certificateFile>/opt/certs/server.crt</certificateFile>
+                <privateKeyFile>/opt/certs/server.key</privateKeyFile>
                 <verificationMode>relaxed</verificationMode>
                 <cacheSessions>true</cacheSessions>
                 <disableProtocols>sslv2,sslv3</disableProtocols>
@@ -59,7 +44,7 @@ spec:
               </server>
               <client>
                 <loadDefaultCAFile>false</loadDefaultCAFile>
-                <caConfig>/etc/clickhouse-server/secrets.d/ca.crt/server-crt/ca.crt</caConfig>
+                <caConfig>/opt/certs/ca.crt</caConfig>
                 <cacheSessions>true</cacheSessions>
                 <disableProtocols>sslv2,sslv3</disableProtocols>
                 <preferServerCiphers>true</preferServerCiphers>

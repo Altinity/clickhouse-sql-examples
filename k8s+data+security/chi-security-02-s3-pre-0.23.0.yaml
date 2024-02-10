@@ -27,8 +27,6 @@ spec:
               <endpoint from_env="MY_AWS_S3_ENDPOINT"/>
               <secret_access_key from_env="MY_AWS_SECRET_ACCESS_KEY"/>
               <access_key_id from_env="MY_AWS_ACCESS_KEY_ID"/>
-              <region>us-west-2</region>
-              <use_environment_credentials>false</use_environment_credentials>
             </playground>
           </s3>
         </clickhouse>
