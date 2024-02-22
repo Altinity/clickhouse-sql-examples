@@ -19,7 +19,7 @@ CREATE TABLE product (
 Engine=MergeTree
 PARTITION BY toDate(start_date)
 ORDER BY (category_id, id, start_date)
-SETTINGS non_replicated_deduplication_window = 100;
+SETTINGS non_replicated_deduplication_window = 100
 ;
 
 -- A bid on the product. 
@@ -34,7 +34,7 @@ CREATE TABLE bid (
 Engine=MergeTree
 PARTITION BY toDate(product_start_date)
 ORDER BY (bidder_id, product_start_date, id)
-SETTINGS non_replicated_deduplication_window = 100;
+SETTINGS non_replicated_deduplication_window = 100
 ;
 
 -- A lookup table for product categories. 
