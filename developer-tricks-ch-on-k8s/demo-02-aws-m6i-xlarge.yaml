@@ -1,0 +1,40 @@
+# ClickHouse using default storage class. 
+apiVersion: "clickhouse.altinity.com/v1"
+kind: "ClickHouseInstallation"
+metadata:
+  name: "demo"
+spec:
+  configuration:
+    clusters:
+      - name: "cl"
+        layout:
+          replicasCount: 1
+          shardsCount: 2
+        templates:
+          volumeClaimTemplate: storage
+          podTemplate: replica
+    zookeeper:
+        nodes:
+        - host: zookeeper.zoo1ns
+          port: 2181
+  templates:
+    podTemplates:
+      - name: replica
+        spec:
+          containers:
+          - name: clickhouse
+            image: altinity/clickhouse-server:23.8.8.21.altinitystable
+          nodeSelector:
+            node.kubernetes.io/instance-type: m6i.xlarge
+        podDistribution:
+          - type: ClickHouseAntiAffinity
+            scope: ClickHouseInstallation
+    volumeClaimTemplates:
+      - name: storage
+        reclaimPolicy: Retain
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 50Gi
