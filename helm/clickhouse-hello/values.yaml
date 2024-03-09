@@ -1,0 +1,22 @@
+# Default values for 1-node ClickHouse server (chi) and Keeper (chk) resources.
+
+all:
+  metadata:
+    labels:
+      application_group: "hello"
+
+clickhouse:
+  name: hello
+  cluster: ch
+  replicasCount: 1
+  shardsCount: 1
+  image: "altinity/clickhouse-server:23.8.8.21.altinitystable"
+  storage: 50Gi
+
+keeper:
+  name: hello-keeper
+  replicas: 1
+  listen_host: "0.0.0.0"
+  tcp_port: 2181
+  image: "altinity/clickhouse-keeper:23.8.8.21.altinitystable"
+  storage: 25Gi
