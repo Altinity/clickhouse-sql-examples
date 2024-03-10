@@ -1,10 +1,10 @@
 # Sample Helm charts for ClickHouse and ClickHouse Keeper
 
-The samples in this directory illustrate simple helm charts that can be 
+The samples in this directory illustrate simple Helm charts that can be 
 used to deploy ClickHouse and Keeper resources. 
 
-We do not make an effort to show everything users can do with helm and , but
-rather provide a starting point for further embroidery. 
+We do not make an effort to show everything users can do with Helm. The
+samples provide a starting point for further embroidery. 
 
 ## Prerequisites
 
@@ -20,10 +20,14 @@ helm repo add clickhouse-operator https://docs.altinity.com/clickhouse-operator/
 helm install clickhouse-operator clickhouse-operator/altinity-clickhouse-operator
 ```
 
+Please note the Altinity Operator project instructions regarding operator
+upgrade with Helm. You need to run the custom resource definition files
+independently.
+
 ## Quick Start
 
 ### Install Helm chart for hello server
-Clone this repo and install the helm clickhouse-hello chart directly from the file system. 
+Clone this repo and install the Helm clickhouse-hello chart directly from the file system. 
 
 ```
 git clone https://github.com/Altinity/clickhouse-sql-examples.git
@@ -74,11 +78,11 @@ helm uninstall hello
 kubectl delete pvc -l application_group=hello
 ```
 
-## AWS EKS sample chart
+## AWS EKS Sample Helm Chart
 
 The clickhouse-aws chart shows how to run ClickHouse on AWS EKS across AZs using 
 a nodeSelector to pin resources to run on specific VMs types. 
 
 ## Bugs and Issues
 
-Please log issues on the project and/or submit PRs if you have solutions to them. 
+Please log issues on this project and/or submit PRs if you have solutions to them. 

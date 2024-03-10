@@ -30,6 +30,10 @@ spec:
             app: keeper
             what: node
         spec:
+          # Workaround to ensure correct FS permissions.
+          securityContext:
+            fsGroup: 101 
+            runAsUser: 101 
           affinity:
             podAntiAffinity:
               preferredDuringSchedulingIgnoredDuringExecution:
