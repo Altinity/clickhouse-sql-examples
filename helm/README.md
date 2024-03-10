@@ -22,6 +22,7 @@ helm install clickhouse-operator clickhouse-operator/altinity-clickhouse-operato
 
 ## Quick Start
 
+### Install Helm chart for hello server
 Clone this repo and install the helm clickhouse-hello chart directly from the file system. 
 
 ```
@@ -37,7 +38,7 @@ the following to see the manifests.
 helm install --debug --dry-run test clickhouse-hello
 ```
 
-## Connect to your new ClickHouse server. 
+### Connect to your new ClickHouse server. 
 
 Here's how to connect and make sure ClickHouse can see the Keeper server. 
 
@@ -49,7 +50,7 @@ SELECT * FROM system.zookeeper WHERE path = '/'
 If things are correctly wired, both commands will succeed and you'll see a 
 list of path names in Keeper. 
 
-## Modifying and Upgrading
+### Modifying and Upgrading
 
 You can change the settings in values.yaml and reapply the chart. 
 
@@ -62,9 +63,9 @@ You can also override using your own values.
 helm upgrade hello clickhouse-hello -f newvalues.yaml
 ```
 
-## Removing
+### Removing
 
-Remove the sample CHI and CHK resources using helm uninstall. You'll also 
+Remove the sample CHI and CHK resources using `helm uninstall`. You'll also 
 have to delete PVCs explicitly. This is a safety precaution to prevent
 accidental deletion of clusters and their storage.
 
@@ -72,3 +73,12 @@ accidental deletion of clusters and their storage.
 helm uninstall hello
 kubectl delete pvc -l application_group=hello
 ```
+
+## AWS EKS sample chart
+
+The clickhouse-aws chart shows how to run ClickHouse on AWS EKS across AZs using 
+a nodeSelector to pin resources to run on specific VMs types. 
+
+## Bugs and Issues
+
+Please log issues on the project and/or submit PRs if you have solutions to them. 
