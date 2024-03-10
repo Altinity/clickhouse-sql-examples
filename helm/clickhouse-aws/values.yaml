@@ -3,18 +3,27 @@
 all:
   metadata:
     labels:
-      application_group: "hello"
+      application_group: "aws"
 
 clickhouse:
-  name: hello
+  name: aws
   cluster: ch
-  replicasCount: 1
-  shardsCount: 1
+  zones: 
+    - us-west-2a
+    - us-west-2a
+    - us-west-2c
+  nodeSelector: m6i.large
   image: "altinity/clickhouse-server:23.8.8.21.altinitystable"
   storage: 50Gi
 
 keeper:
-  name: hello-keeper
+  name: aws-keeper
+  cluster: chk
+  zones: 
+    - us-west-2a
+    - us-west-2a
+    - us-west-2c
+  nodeSelector: m6i.large
   replicas: 1
   listen_host: "0.0.0.0"
   tcp_port: 2181

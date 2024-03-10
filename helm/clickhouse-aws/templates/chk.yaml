@@ -1,0 +1,87 @@
+apiVersion: "clickhouse-keeper.altinity.com/v1"
+kind: "ClickHouseKeeperInstallation"
+metadata:
+  name: "{{ .Values.keeper.name }}"
+  labels:
+    application_group: "{{ .Values.all.metadata.labels.application_group }}"
+spec:
+  configuration:
+    clusters:
+      - name: "{{ .Values.keeper.cluster }}"
+        layout:
+          replicas:
+            {{- range .Values.keeper.zones }}
+            - templates:
+                podTemplate: replica-in-zone-{{ . }}
+            {{- end }}
+  configuration:
+    settings:
+      logger/level: "trace"
+      logger/console: "true"
+      listen_host: "{{ .Values.keeper.listen_host }}"
+      keeper_server/storage_path: /var/lib/clickhouse-keeper
+      keeper_server/tcp_port: "{{ .Values.keeper.tcp_port }}"
+      keeper_server/four_letter_word_white_list: "*"
+      keeper_server/coordination_settings/raft_logs_level: "information"
+      keeper_server/raft_configuration/server/port: "9444"
+      prometheus/endpoint: "/metrics"
+      prometheus/port: "7000"
+      prometheus/metrics: "true"
+      prometheus/events: "true"
+      prometheus/asynchronous_metrics: "true"
+      prometheus/status_info: "false"
+  templates:
+    podTemplates:
+      {{- range .Values.keeper.zones }}
+      - name: replica-in-zone-{{ . }}
+        metadata:
+          labels:
+            app: clickhouse-keeper
+            what: node
+        spec:
+          affinity:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - weight: 50
+                  podAffinityTerm:
+                    labelSelector:
+                      matchExpressions:
+                        - key: "app"
+                          operator: In
+                          values:
+                            - clickhouse-keeper
+                    topologyKey: "kubernetes.io/hostname"
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                - matchExpressions:
+                  - key: topology.kubernetes.io/zone
+                    operator: In
+                    values:
+                    - {{ . }}
+          containers:
+            - name: clickhouse-keeper
+              imagePullPolicy: IfNotPresent
+              image: "{{ $.Values.keeper.image }}"
+              resources:
+                requests:
+                  memory: "256M"
+                  cpu: "1"
+                limits:
+                  memory: "4Gi"
+                  cpu: "2"
+          nodeSelector:
+            node.kubernetes.io/instance-type: {{ $.Values.keeper.nodeSelector }}
+      {{- end }}
+    volumeClaimTemplates:
+      - name: t1
+        metadata:
+          name: both-paths
+          labels:
+            application_group: "{{ .Values.all.metadata.labels.application_group }}"
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: "{{ .Values.keeper.storage }}"
