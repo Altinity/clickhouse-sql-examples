@@ -6,6 +6,10 @@ used to deploy ClickHouse and Keeper resources.
 We do not make an effort to show everything users can do with Helm. The
 samples provide a starting point for further embroidery. 
 
+**IMPORTANT NOTE** The ClickHouseKeeperInstallation (CHK) resource is still  marked
+as experimental by the cloud engineering team. It should not be used (yet) in 
+production systems. We therefore recommend to continue with ZooKeeper for now. 
+
 ## Prerequisites
 
 You'll need to do the following to get started. 
