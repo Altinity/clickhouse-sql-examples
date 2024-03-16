@@ -3,10 +3,10 @@
 all:
   metadata:
     labels:
-      application_group: "hello"
+      application_group: "experimental"
 
 clickhouse:
-  name: hello
+  name: experimental
   cluster: 
     name: ch
     replicasCount: 1
@@ -21,10 +21,11 @@ clickhouse:
   service:
     # Options are ClusterIP or LoadBalancer. The latter will create an 
     # external load balancer on AWS EKS. 
-    type: ClusterIP
+    #type: ClusterIP
+    type: LoadBalancer
 
 keeper:
-  name: hello
+  name: experimental
   replicas: 1
   listen_host: "0.0.0.0"
   tcp_port: 2181

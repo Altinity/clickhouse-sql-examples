@@ -1,14 +1,19 @@
 # Sample Helm charts for ClickHouse and ClickHouse Keeper
 
 The samples in this directory illustrate simple Helm charts that can be 
-used to deploy ClickHouse and Keeper resources. 
+used to deploy ClickHouse and ClickHouse Keeper.
 
 We do not make an effort to show everything users can do with Helm. The
 samples provide a starting point for further embroidery. 
 
-**IMPORTANT NOTE** The ClickHouseKeeperInstallation (CHK) resource is still  marked
-as experimental by the cloud engineering team. It should not be used (yet) in 
-production systems. We therefore recommend to continue with ZooKeeper for now. 
+*Important notes:* 
+
+1. ClickHouse Keeper resources (CHK) are not stable yet. They should not
+   be used for production. 
+2. Connections are unencrypted. Do not use them for sensitive data.
+3. If you select the LoadBalancer service type in values.yaml it will open
+   one or more ports to the Internet. 
+>>>>>>> bfe1c81 (Teach helm not to create external load balancer on EKS)
 
 ## Prerequisites
 
@@ -30,6 +35,9 @@ independently.
 
 ## Quick Start
 
+This shows how to get started with the 'hello' chart. Examples use
+defaults from the values.yaml file. 
+
 ### Install Helm chart for hello server
 Clone this repo and install the Helm clickhouse-hello chart directly from the file system. 
 
@@ -46,17 +54,35 @@ the following to see the manifests.
 helm install --debug --dry-run test clickhouse-hello
 ```
 
-### Connect to your new ClickHouse server. 
+### Connect to your new ClickHouse from inside Kubernetes
 
 Here's how to connect and make sure ClickHouse can see the Keeper server. 
 
 ```
-kubectl exec -it chi-hello-ch-0-0-0 -- clickhouse-client
+kubectl exec -it chi-hello-ch-0-0-0 -- clickhouse-client --user=helm-user --password=topsecret
 SELECT * FROM system.zookeeper WHERE path = '/'
 ```
 
 If things are correctly wired, both commands will succeed and you'll see a 
 list of path names in Keeper. 
+
+If you would like to connect to the server from outside, use `kubectl port forward`
+as shown below. 
+
+```
+kubectl port-forward service clickhouse-hello 9000:9000 &
+clickhouse-client --user=helm-user --password=topsecret
+```
+
+The login and password are set in values.yaml. Current values are stored in
+Secret clickhouse-hello. If you forget the login and password you can find them 
+at any time using the following command: 
+
+```
+kubectl get secret/clickhouse-hello -o json | jq '.data' | jq 'map_values(@base64d)'
+```
+
+You may need to install 'jq' for this to work. 
 
 ### Modifying and Upgrading
 
@@ -73,7 +99,7 @@ helm upgrade hello clickhouse-hello -f newvalues.yaml
 
 ### Removing
 
-Remove the sample CHI and CHK resources using `helm uninstall`. You'll also 
+Remove the sample resources using `helm uninstall`. You'll also 
 have to delete PVCs explicitly. This is a safety precaution to prevent
 accidental deletion of clusters and their storage.
 
@@ -85,7 +111,8 @@ kubectl delete pvc -l application_group=hello
 ## AWS EKS Sample Helm Chart
 
 The clickhouse-aws chart shows how to run ClickHouse on AWS EKS across AZs using 
-a nodeSelector to pin resources to run on specific VMs types. 
+a nodeSelector to pin resources to run on specific VMs types. See the local 
+README.md for more information. 
 
 ## Bugs and Issues
 
