@@ -39,7 +39,23 @@ sysbench cpu --threads=4 --time=120 run
 
 Install and run stress (`sudo apt install stress`) to eat up memory. 
 ```
-stress -m 4 --vm-bytes 4G
+stress -m 8 --vm-bytes 4G --timeout 60
+```
+
+## Using SQL to find out interesting things
+
+Once you have data loaded you can ask any question you want in SQL. 
+Here's how to find hosts that had more than 25% load in the last day. 
+```
+SELECT host, count() AS loaded_minutes
+FROM (
+    SELECT
+        toStartOfMinute(timestamp) AS minute, host, avg(100 - id) AS load
+    FROM monitoring.vmstat
+    WHERE timestamp > (now() - toIntervalDay(1))
+    GROUP BY minute, host HAVING load > 25
+)
+GROUP BY host ORDER BY loaded_minutes DESC
 ```
 
 ## Using Fluent Bit
