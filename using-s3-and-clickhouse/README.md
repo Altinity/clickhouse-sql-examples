@@ -55,7 +55,9 @@ without change.
 # Clustered server scripts. 
 cc-batch < sql-11-create-s3-replicated.sql  
 cc-batch < sql-12-insert-data-replicated.sql  
+cc-batch < sql-03-statistics.sql
 cc-batch < sql-14-benchmark.sql
+cc-batch < sql-05-telemetry.sql
 ```
 
 ## Metrics and Counters for S3
@@ -67,3 +69,28 @@ Count the actual bytes stored in S3 with a command like the following:
 ```
 aws s3 ls --summarize --human-readable --recursive s3://bucket/clickhouse/s3/mergetree/
 ```
+
+## Cleaning up [Zoo]Keeper
+
+It's easy to mess up Keeper metdata when managing data in S3. If so you may run into 
+the dreaded REPLICA_ALREADY_EXISTS problem like the following: 
+
+```
+Received exception from server (version 23.7.4):
+Code: 253. DB::Exception: Received from localhost:9000. DB::Exception: There was an error on [chi-demo2-s3-0-0:9000]: Code: 253. DB::Exception: Replica /clickhouse/s3/tables/0/default/test_local/replicas/chi-demo2-s3-0-0 already exists. (REPLICA_ALREADY_EXISTS) (version 23.7.4.5 (official build)). (REPLICA_ALREADY_EXISTS)
+(query: CREATE TABLE IF NOT EXISTS test_local ON CLUSTER `{cluster}`
+```
+
+Check for invalid replicas using SELECT. 
+```
+SELECT * FROM system.zookeeper WHERE path = '/clickhouse/s3/tables/0/default/test_local/replicas/'
+```
+
+If you see an invalid replica use the following command to prune it from the 
+Keeper path.
+
+```
+SYSTEM DROP REPLICA 'chi-demo2-s3-0-0' FROM ZKPATH '/clickhouse/s3/tables/0/default/test_local'
+```
+
+After running the command the replicas should be gone. 

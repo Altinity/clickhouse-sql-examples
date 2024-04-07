@@ -7,22 +7,23 @@ spec:
     clusters:
       - name: "s3"
         layout:
-          replicasCount: 1
+          replicasCount: 2
           shardsCount: 1
         templates:
           podTemplate: replica-1
           volumeClaimTemplate: storage
     zookeeper:
         nodes:
-        - host: zookeeper
+        - host: aws-keeper
           port: 2181
     files:
-      config.d/ed_zero_copy.xml: |
-        <clickhouse>
-           <merge_tree>
-             <allow_remote_fs_zero_copy_replication>true</allow_remote_fs_zero_copy_replication>
-           </merge_tree>
-        </clickhouse>
+# Disable zero-copy replication for now. 
+#      config.d/ed_zero_copy.xml: |
+#        <clickhouse>
+#           <merge_tree>
+#             <allow_remote_fs_zero_copy_replication>true</allow_remote_fs_zero_copy_replication>
+#           </merge_tree>
+#        </clickhouse>
       config.d/ed_s3.xml: |
         <clickhouse>
           <s3>
@@ -90,7 +91,7 @@ spec:
             node.kubernetes.io/instance-type: m6i.large
           containers:
           - name: clickhouse
-            image: clickhouse/clickhouse-server:23.7.4.5
+            image: clickhouse/clickhouse-server:24.3.2.23
             env:
             - name: AWS_S3_DISK_URL
               valueFrom:
@@ -116,7 +117,7 @@ spec:
       - name: storage
         # reclaimPolicy: Retain
         spec:
-          storageClassName: gp3
+          storageClassName: gp3-encrypted
           accessModes:
             - ReadWriteOnce
           resources:
