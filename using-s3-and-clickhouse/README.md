@@ -1,13 +1,16 @@
 # Examples for Using S3 with ClickHouse
 
 This directory contains examples that demonstrate using S3 storage
-with ClickHouse MergeTree tables. 
+with ClickHouse MergeTree tables. I use them for presentations and
+they change regularly. So you might find inconsistencies from time 
+to time. 
 
 ## Server Startup
 
-The server is defined in Kubernetes. Run these commands to start. The 
-script to generate the secret requires environmental values to be 
-set in the environment. Here's a sample of what that might look like. 
+The server is defined in Kubernetes. Run these commands to start. 
+
+First, the script to generate the secret requires environmental values to
+be set in the environment. Here's a sample of what that might look like.
 
 ```
 export EXT_AWS_ACCESS_KEY_ID=B.....F
@@ -15,9 +18,16 @@ export EXT_AWS_SECRET_ACCESS_KEY=r.....z
 export EXT_AWS_S3_URL="https://s3.us-west-2.amazonaws.com/bucket/"
 ```
 
+Start a Keeper server using helm.
+```
+https://docs.altinity.com/kubernetes-blueprints-for-clickhouse
+helm install keeper kubernetes-blueprints/keeper-sts
+```
+
 Now you can start the server. 
 ```
-# Create secret and load to K8s. 
+# Create secret and load to K8s. This sets S3 endpoint values and passes in 
+# AWS credentials. 
 ./generate_secret.sh
 # Start server.
 kubectl apply -f demo-s3-01.yaml
@@ -70,10 +80,18 @@ Count the actual bytes stored in S3 with a command like the following:
 aws s3 ls --summarize --human-readable --recursive s3://bucket/clickhouse/s3/mergetree/
 ```
 
+## Cleaning up between runs
+
+If you are iterating through and trying things out, it's important to
+clean things up properly between runs. Look at the cleanup-all.sh 
+script for more information. 
+
 ## Cleaning up [Zoo]Keeper
 
-It's easy to mess up Keeper metdata when managing data in S3. If so you may run into 
-the dreaded REPLICA_ALREADY_EXISTS problem like the following: 
+It's easy to mess up Keeper metadata when managing data in S3, especially
+if you create and drop tables rapidly when testing things. If so
+you may run into the dreaded REPLICA_ALREADY_EXISTS problem like the
+following:
 
 ```
 Received exception from server (version 23.7.4):
@@ -86,8 +104,8 @@ Check for invalid replicas using SELECT.
 SELECT * FROM system.zookeeper WHERE path = '/clickhouse/s3/tables/0/default/test_local/replicas/'
 ```
 
-If you see an invalid replica use the following command to prune it from the 
-Keeper path.
+If you see an invalid replica use the following command to prune it from
+the Keeper path.
 
 ```
 SYSTEM DROP REPLICA 'chi-demo2-s3-0-0' FROM ZKPATH '/clickhouse/s3/tables/0/default/test_local'

@@ -27,49 +27,52 @@ spec:
         <clickhouse>
           <storage_configuration>
             <disks>
+              <!-- Disk with single endpoint for all replicas. -->
               <s3_disk>
                 <type>s3</type>
                 <endpoint from_env="AWS_S3_DISK_URL"/>
+                <metadata_path>/var/lib/clickhouse/disks/s3_disk/</metadata_path>
                 <use_environment_credentials>1</use_environment_credentials>
               </s3_disk>
-              <s3_cache>
+              <s3_disk_cache>
                 <type>cache</type>
                 <disk>s3_disk</disk>
-                <path>/var/lib/clickhouse/s3_cache/cache/</path>
+                <path>/var/lib/clickhouse/s3_disk_cache/cache/</path>
                 <max_size>100Gi</max_size>
                 <cache_on_write_operations>1</cache_on_write_operations>
-              </s3_cache>
+              </s3_disk_cache>
             </disks>
             <policies>
-              <s3_direct>
+              <!-- S3-backed MergeTree with single endpoint, no disk cache -->
+              <s3_disk_policy>
                 <volumes>
                   <main>
                     <disk>s3_disk</disk>
                   </main>
                 </volumes>
-              </s3_direct>
-              <s3_cached>
+              </s3_disk_policy>
+              <!-- S3-backed MergeTree with disk cache -->
+              <s3_disk_cache_policy>
                 <volumes>
                   <main>
-                    <disk>s3_cache</disk>
+                    <disk>s3_disk_cache</disk>
                   </main>
                 </volumes>
-              </s3_cached>
-              <s3_tiered>
+              </s3_disk_cache_policy>
+              <!-- Block storage tiered with S3-backed MergeTree -->
+              <s3_tiered_policy>
                 <volumes>
                   <default>
                     <disk>default</disk>
                     <move_factor>0.1</move_factor>
                   </default>
-                  <s3_cached>
-                      <disk>s3_cache</disk>
-                      <!-- 
+                  <s3_disk_cache>
+                      <disk>s3_disk_cache</disk>
                       <prefer_not_to_merge>true</prefer_not_to_merge>
                       <perform_ttl_move_on_insert>false</perform_ttl_move_on_insert>
-                      -->
-                  </s3_cached>
+                  </s3_disk_cache>
                 </volumes>
-              </s3_tiered>
+              </s3_tiered_policy>
             </policies>
           </storage_configuration>
         </clickhouse>
@@ -78,10 +81,10 @@ spec:
       - name: replica-1
         spec:
           nodeSelector:
-            node.kubernetes.io/instance-type: m6i.2xlarge
+            node.kubernetes.io/instance-type: m6i.xlarge
           containers:
           - name: clickhouse
-            image: clickhouse/clickhouse-server:23.7.4.5
+            image: clickhouse/clickhouse-server:24.3.2.23
             env:
             - name: AWS_S3_DISK_URL
               valueFrom:
@@ -107,7 +110,7 @@ spec:
       - name: storage
         # reclaimPolicy: Retain
         spec:
-          storageClassName: gp3
+          storageClassName: gp3-encrypted
           accessModes:
             - ReadWriteOnce
           resources:

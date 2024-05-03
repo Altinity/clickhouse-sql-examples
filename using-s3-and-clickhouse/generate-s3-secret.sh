@@ -15,7 +15,9 @@ metadata:
 type: Opaque
 stringData:
   AWS_S3_DATALAKE_URL: ${EXT_AWS_S3_URL}/datalake/
-  AWS_S3_DISK_URL: ${EXT_AWS_S3_URL}/mergetree/
+  AWS_S3_DISK_URL: ${EXT_AWS_S3_URL}/{installation}/s3_disk/
+  AWS_S3_DISK_WITH_REPLICA_URL: ${EXT_AWS_S3_URL}/{installation}/s3_disk_with_replica/{replica}/
+  AWS_S3_ZERO_COPY_URL: ${EXT_AWS_S3_URL}/{installation}/s3_zero_copy/{shard}/
   AWS_ACCESS_KEY_ID: $EXT_AWS_ACCESS_KEY_ID
   AWS_SECRET_ACCESS_KEY: $EXT_AWS_SECRET_ACCESS_KEY
 END

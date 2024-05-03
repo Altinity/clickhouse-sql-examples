@@ -17,3 +17,10 @@ FROM system.parts GROUP BY disk_name ORDER BY disk_name;
 -- Get amount of storage currently managed in s3. 
 SELECT formatReadableSize(sum(size))
 FROM system.remote_data_paths;
+
+-- Get amount of storage currently managed in s3. 
+SELECT disk_name, path, count() as files, 
+  formatReadableSize(sum(size)) as bytes
+FROM system.remote_data_paths
+GROUP BY disk_name, path ORDER BY disk_name, path;
+

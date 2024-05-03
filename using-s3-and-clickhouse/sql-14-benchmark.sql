@@ -8,8 +8,12 @@ SELECT * FROM test WHERE A = 443;
 SELECT uniq(A) FROM test;
 SELECT count() FROM test WHERE S LIKE '%4422%';
 
--- Test against S3 direct. 
-SELECT * FROM test_s3_direct WHERE A = 443;
-SELECT uniq(A) FROM test_s3_direct;
-SELECT count() FROM test_s3_direct WHERE S LIKE '%4422%';
+-- Test against S3 disk. 
+SELECT * FROM test_s3_disk WHERE A = 443;
+SELECT uniq(A) FROM test_s3_disk;
+SELECT count() FROM test_s3_disk WHERE S LIKE '%4422%';
 
+-- Test against S3 disk with zero copy replication.
+SELECT * FROM test_s3_zero_copy WHERE A = 443;
+SELECT uniq(A) FROM test_s3_zero_copy;
+SELECT count() FROM test_s3_zero_copy WHERE S LIKE '%4422%';

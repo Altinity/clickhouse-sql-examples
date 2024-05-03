@@ -9,9 +9,9 @@ SELECT uniq(A) FROM test;
 SELECT count() FROM test WHERE S LIKE '%4422%';
 
 -- Test against S3 direct. 
-SELECT * FROM test_s3_direct WHERE A = 443;
-SELECT uniq(A) FROM test_s3_direct;
-SELECT count() FROM test_s3_direct WHERE S LIKE '%4422%';
+SELECT * FROM test_s3_disk WHERE A = 443;
+SELECT uniq(A) FROM test_s3_disk;
+SELECT count() FROM test_s3_disk WHERE S LIKE '%4422%';
 
 -- Test against S3 cached with cache empty. 
 SYSTEM DROP FILESYSTEM CACHE;

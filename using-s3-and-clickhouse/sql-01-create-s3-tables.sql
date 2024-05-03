@@ -1,10 +1,10 @@
 DROP TABLE IF EXISTS test;
 
-DROP TABLE IF EXISTS test_s3_direct;
+DROP TABLE IF EXISTS test_s3_disk SYNC;
 
-DROP TABLE IF EXISTS test_s3_cached;
+DROP TABLE IF EXISTS test_s3_cached SYNC;
 
-DROP TABLE IF EXISTS test_s3_tiered;
+DROP TABLE IF EXISTS test_s3_tiered SYNC;
 
 CREATE TABLE test
 (
@@ -16,7 +16,7 @@ ENGINE = MergeTree
 PARTITION BY D
 ORDER BY A;
 
-CREATE TABLE test_s3_direct
+CREATE TABLE test_s3_disk
 (
     `A` Int64,
     `S` String,
@@ -25,7 +25,7 @@ CREATE TABLE test_s3_direct
 ENGINE = MergeTree
 PARTITION BY D
 ORDER BY A
-SETTINGS storage_policy = 's3_direct';
+SETTINGS storage_policy = 's3_disk_policy';
 
 CREATE TABLE test_s3_cached
 (
@@ -36,7 +36,7 @@ CREATE TABLE test_s3_cached
 ENGINE = MergeTree
 PARTITION BY D
 ORDER BY A
-SETTINGS storage_policy = 's3_cached';
+SETTINGS storage_policy = 's3_disk_cache_policy';
 
 CREATE TABLE test_s3_tiered
 (
@@ -47,5 +47,5 @@ CREATE TABLE test_s3_tiered
 ENGINE = MergeTree
 PARTITION BY D
 ORDER BY A
-TTL D + INTERVAL 7 DAY TO VOLUME 's3_cached'
-SETTINGS storage_policy = 's3_tiered';
+TTL D + INTERVAL 7 DAY TO VOLUME 's3_disk_cache'
+SETTINGS storage_policy = 's3_tiered_policy';

@@ -1,49 +1,83 @@
-<clickhouse>
-  <storage_configuration>
-    <disks>
-      <s3_disk>
-        <type>s3</type>
-        <endpoint from_env="AWS_S3_DISK_URL"/>
-        <use_environment_credentials>1</use_environment_credentials>
-        <metadata_path>/var/lib/clickhouse/disks/s3_disk/</metadata_path>
-      </s3_disk>
-      <s3_cache>
-        <type>cache</type>
-        <disk>s3_disk</disk>
-        <path>/var/lib/clickhouse/s3_cache/cache/</path>
-        <max_size>500Gi</max_size>
-        <cache_on_write_operations>1</cache_on_write_operations>
-      </s3_cache>
-    </disks>
-    <policies>
-      <s3_direct>
-        <volumes>
-          <main>
-            <disk>s3_disk</disk>
-          </main>
-        </volumes>
-      </s3_direct>
-      <s3_cached>
-        <volumes>
-          <main>
-            <disk>s3_cache</disk>
-          </main>
-        </volumes>
-      </s3_cached>
-      <s3_tiered>
-        <volumes>
-          <default>
-            <disk>default</disk>
-          </default>
-          <s3_cached>
-              <disk>s3_cache</disk>
-              <!-- 
-              <prefer_not_to_merge>true</prefer_not_to_merge>
-              <perform_ttl_move_on_insert>false</perform_ttl_move_on_insert>
-              -->
-          </s3_cached>
-        </volumes>
-      </s3_tiered>
-    </policies>
-  </storage_configuration>
-</clickhouse>
+        <clickhouse>
+          <storage_configuration>
+            <disks>
+              <!-- Disk with single endpoint for all replicas. -->
+              <s3_disk>
+                <type>s3</type>
+                <endpoint from_env="AWS_S3_DISK_URL"/>
+                <metadata_path>/var/lib/clickhouse/disks/s3_disk/</metadata_path>
+                <use_environment_credentials>1</use_environment_credentials>
+              </s3_disk>
+              <!-- Disk with separate endpoint for each replica. -->
+              <s3_disk_with_replica>
+                <type>s3</type>
+                <endpoint from_env="AWS_S3_DISK_WITH_REPLICA_URL"/>
+                <metadata_path>/var/lib/clickhouse/disks/s3_disk_with_replica/</metadata_path>
+                <use_environment_credentials>1</use_environment_credentials>
+              </s3_disk_with_replica>
+              <!-- Disk with single endpoint for each shard. -->
+              <s3_zero_copy>
+                <type>s3</type>
+                <endpoint from_env="AWS_S3_ZERO_COPY_URL"/>
+                <metadata_path>/var/lib/clickhouse/disks/s3_zero_copy/</metadata_path>
+                <use_environment_credentials>1</use_environment_credentials>
+              </s3_zero_copy>
+              <!-- Local disk cache -->
+              <s3_disk_cache>
+                <type>cache</type>
+                <disk>s3_disk</disk>
+                <path>/var/lib/clickhouse/s3_disk_cache/cache/</path>
+                <max_size>100Gi</max_size>
+                <cache_on_write_operations>1</cache_on_write_operations>
+              </s3_disk_cache>
+            </disks>
+            <policies>
+              <!-- S3-backed MergeTree with single endpoint, no disk cache -->
+              <s3_disk_policy>
+                <volumes>
+                  <main>
+                    <disk>s3_disk</disk>
+                  </main>
+                </volumes>
+              </s3_disk_policy>
+              <!-- S3-backed MergeTree with an endpoint for each replica, no disk cache -->
+              <s3_disk_with_replica_policy>
+                <volumes>
+                  <main>
+                    <disk>s3_disk_with_replica</disk>
+                  </main>
+                </volumes>
+              </s3_disk_with_replica_policy>
+              <!-- S3-backed MergeTree with disk cache -->
+              <s3_disk_cached_policy>
+                <volumes>
+                  <main>
+                    <disk>s3_disk_cache</disk>
+                  </main>
+                </volumes>
+              </s3_disk_cached_policy>
+              <!-- Block storage tiered with S3-backed MergeTree -->
+              <s3_tiered_policy>
+                <volumes>
+                  <default>
+                    <disk>default</disk>
+                    <move_factor>0.1</move_factor>
+                  </default>
+                  <s3_disk_cached>
+                      <disk>s3_disk_cache</disk>
+                      <prefer_not_to_merge>true</prefer_not_to_merge>
+                      <perform_ttl_move_on_insert>false</perform_ttl_move_on_insert>
+                  </s3_disk_cached>
+                </volumes>
+              </s3_tiered_policy>
+              <!-- S3-backed MergeTree with zero-copy replication -->
+              <s3_zero_copy_policy>
+                <volumes>
+                  <main>
+                    <disk>s3_zero_copy</disk>
+                  </main>
+                </volumes>
+              </s3_zero_copy_policy>
+            </policies>
+          </storage_configuration>
+        </clickhouse>
