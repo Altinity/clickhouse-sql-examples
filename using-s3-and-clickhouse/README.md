@@ -5,7 +5,24 @@ with ClickHouse MergeTree tables. I use them for presentations and
 they change regularly. So you might find inconsistencies from time 
 to time. 
 
-## Server Startup
+## Prerequisites
+
+You will need a Kubernetes cluster with the operator installed. You 
+can use the [Terraform AWS EKS Blueprint project](https://github.com/Altinity/terraform-aws-eks-clickhouse)
+to do this. 
+
+If you use another method make sure you have a namespace set up for
+the samples and that you have installed the Altinity Kubernetes 
+Operator for ClickHouse in it. Here are suitable commands. 
+
+```
+kubectl create ns clickhouse
+kubectl config set-context --current --namespace=clickhouse
+helm repo add clickhouse-operator https://docs.altinity.com/clickhouse-operator/
+helm install clickhouse-operator clickhouse-operator/altinity-clickhouse-operator
+```
+
+## ClickHouse Startup
 
 The server is defined in Kubernetes. Run these commands to start. 
 
@@ -20,7 +37,7 @@ export EXT_AWS_S3_URL="https://s3.us-west-2.amazonaws.com/bucket/"
 
 Start a Keeper server using helm.
 ```
-https://docs.altinity.com/kubernetes-blueprints-for-clickhouse
+helm repo add https://docs.altinity.com/kubernetes-blueprints-for-clickhouse
 helm install keeper kubernetes-blueprints/keeper-sts
 ```
 
@@ -39,7 +56,7 @@ accessible.
 
 Use the SQL scripts to create tables and run benchmark scripts. 
 ```
-alias cc-batch='clickhouse-client -m -n --verbose -t --echo -f Pretty'
+alias cc-batch='clickhouse-client -m -n --verbose -t --echo -f PrettyCompact --output_format_pretty_row_numbers=0'
 # Single server scripts. 
 cc-batch < sql-00-check-liveness.sql
 cc-batch < sql-01-create-s3-tables.sql
@@ -59,6 +76,9 @@ kubectl delete chi/demo
 kubectl apply -f demo2-s3-01.yaml
 ```
 
+After server is started, run `port-forward-2.sh` to make ports 
+accessible. 
+
 Run test scripts. sql-03 and sql-05 scripts run against replicated server
 without change. 
 ```
@@ -68,6 +88,13 @@ cc-batch < sql-12-insert-data-replicated.sql
 cc-batch < sql-03-statistics.sql
 cc-batch < sql-14-benchmark.sql
 cc-batch < sql-05-telemetry.sql
+```
+
+Run the following scripts to measure and enumerate orphans. 
+```
+(cat sql-17a-orphans.sql |envsubst) |cc-batch
+(cat sql-17b-s3-file-mv.sql |envsubst) |cc-batch
+(cat sql-17c-safer-orphan-search.sql |envsubst) |cc-batch
 ```
 
 ## Metrics and Counters for S3

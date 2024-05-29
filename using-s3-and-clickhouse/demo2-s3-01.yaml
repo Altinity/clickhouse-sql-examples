@@ -16,6 +16,8 @@ spec:
         nodes:
         - host: keeper-keeper
           port: 2181
+    profiles:
+      default/allow_experimental_refreshable_materialized_view: 1
     files:
       # Allow zero-copy replication for demonstration purposes. It
       # should be used very cautiously in production settings. 
@@ -126,7 +128,7 @@ spec:
             node.kubernetes.io/instance-type: m6i.large
           containers:
           - name: clickhouse
-            image: clickhouse/clickhouse-server:24.3.2.23
+            image: clickhouse/clickhouse-server:24.3.3.102
             env:
             - name: AWS_S3_DISK_URL
               valueFrom:
