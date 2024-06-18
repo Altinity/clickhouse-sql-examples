@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS test_local ON CLUSTER `{cluster}`
     `S` String,
     `D` Date
 )
-ENGINE = ReplicatedMergeTree('/clickhouse/{cluster}/tables/{shard}/{database}/test_local', '{replica}')
+ENGINE = ReplicatedMergeTree
 PARTITION BY D ORDER BY A;
 
 CREATE TABLE IF NOT EXISTS test ON CLUSTER `{cluster}`
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS test_s3_disk_local ON CLUSTER `{cluster}`
     `S` String,
     `D` Date
 )
-ENGINE = ReplicatedMergeTree('/clickhouse/{cluster}/tables/{shard}/{database}/test_s3_disk_local', '{replica}')
+ENGINE = ReplicatedMergeTree
 PARTITION BY D
 ORDER BY A
 SETTINGS storage_policy = 's3_disk_policy';
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS test_s3_disk_with_replica_local ON CLUSTER `{cluster}
     `S` String,
     `D` Date
 )
-ENGINE = ReplicatedMergeTree('/clickhouse/{cluster}/tables/{shard}/{database}/test_s3_disk_with_replica_local', '{replica}')
+ENGINE = ReplicatedMergeTree
 PARTITION BY D
 ORDER BY A
 SETTINGS storage_policy = 's3_disk_with_replica_policy';
@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS test_s3_zero_copy_local ON CLUSTER `{cluster}`
     `S` String,
     `D` Date
 )
-ENGINE = ReplicatedMergeTree('/clickhouse/{cluster}/tables/{shard}/{database}/test_s3_zero_copy_local', '{replica}')
+ENGINE = ReplicatedMergeTree
 PARTITION BY D
 ORDER BY A
 SETTINGS storage_policy = 's3_zero_copy_policy', allow_remote_fs_zero_copy_replication=1;
