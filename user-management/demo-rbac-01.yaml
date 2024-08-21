@@ -1,0 +1,66 @@
+apiVersion: "clickhouse.altinity.com/v1"
+kind: "ClickHouseInstallation"
+metadata:
+  name: "demo"
+spec:
+  configuration:
+    clusters:
+      - name: "rbac"
+        layout:
+          replicasCount: 1
+          shardsCount: 2
+        templates:
+          podTemplate: replica-1
+          volumeClaimTemplate: storage
+    zookeeper:
+        nodes:
+        - host: keeper-keeper
+    users:
+      # Create user 'root' with ability to issue SQL RBAC commands. 
+      # (Password = 'topsecret')
+      root/networks/ip: "::/0"
+      root/password_sha256_hex: 53336a676c64c1396553b2b7c92f38126768827c93b64d9142069c10eda7a721
+      root/profile: "default"
+      root/access_management: 1
+    files:
+      users.d/xml_user.xml: |
+        <clickhouse>
+          <users>
+            <xmluser>
+              <networks>
+                <ip>::/0</ip>
+              </networks>
+              <password_sha256_hex>53336a676c64c1396553b2b7c92f38126768827c93b64d9142069c10eda7a721</password_sha256_hex>
+              <profile>default</profile>
+              <quota>default</quota>
+              <grants>
+                <query>GRANT SELECT ON default.*</query>
+              </grants>
+              <databases>
+                <default>
+                    <rp_example>
+                        <filter>group = 1</filter>
+                    </rp_example>
+                </default>
+              </databases>
+            </xmluser>
+          </users>
+        </clickhouse>
+  templates:
+    podTemplates:
+      - name: replica-1
+        spec:
+          containers:
+          - name: clickhouse
+            image: altinity/clickhouse-server:24.3.5.47.altinitystable
+    volumeClaimTemplates:
+      - name: storage
+        # No need to retain storage. 
+        # reclaimPolicy: Retain
+        spec:
+          storageClassName: gp3-encrypted
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 200Gi

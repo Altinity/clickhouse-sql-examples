@@ -1,0 +1,21 @@
+<clickhouse>
+  <users>
+    <xml_user>
+      <access_management>1</access_management>
+      <networks><ip>::1</ip></networks>
+      <password_sha256_hex>53336a676c64c1396553b2b7c92f38126768827c93b64d9142069c10eda7a721</password_sha256_hex>
+      <profile>default</profile>
+      <quota>default</quota>
+      <grants>
+        <query>GRANT SELECT ON default.*</query>
+      </grants>
+      <databases>
+        <default>
+            <rp_example>
+                <filter>group = 1</filter>
+            </rp_example>
+        </default>
+      </databases>
+    </xml_user>
+  </users>
+</clickhouse>
