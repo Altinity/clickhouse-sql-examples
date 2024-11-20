@@ -24,7 +24,7 @@ PARTITION BY toYear(created)
 -- Ingest it will use 4GB of RAM beware
 
 INSERT INTO geo_tests.cell_towers_landing
-SELECT * FROM url('https://datasets.clickhouse.com/cell_towers.csv.xz', CSVWithNames);
+SELECT * FROM url('https://altinity-datasets.s3.us-east-005.backblazeb2.com/cell_towers.csv.gz', CSVWithNames);
 
 
 CREATE TABLE geo_tests.mcc_listing
