@@ -67,3 +67,37 @@ You can also use Fluenti Bit to collect data. Here's how to try it out.
 3. Start Fluent Bit: `fluentbit -c fluent-http.conf`
 
 Don't for get to modify the credentials and ClickHouse server location in fluent-http.conf. 
+
+## Demo commands
+
+Set up ssh tunneling. 
+```
+ssh -L 9000:logos3:9000 -L 3000:logos3vmstat:3000 -L 8123:logos3:8123 logos2
+```
+
+Show how to generate data. 
+```
+vmstat
+more vmstat-producer.py
+./vmstat-producer.py
+more vmstat-consumer.py
+curl http://logos3:8123?query='select+version()'
+```
+
+Put some load on the system!
+```
+stress -m 6 --vm-bytes 4G --timeout 60
+```
+
+Run a query to see how the system has been loaded recently. 
+```
+SELECT host, count() AS loaded_minutes
+FROM (
+    SELECT
+        toStartOfMinute(timestamp) AS minute, host, avg(100 - id) AS load
+    FROM monitoring.vmstat
+    WHERE timestamp > (now() - toIntervalDay(1))
+    GROUP BY minute, host HAVING load > 25
+)
+GROUP BY host ORDER BY loaded_minutes DESC
+```
