@@ -2,20 +2,20 @@
 apiVersion: "clickhouse.altinity.com/v1"
 kind: "ClickHouseInstallation"
 metadata:
-  name: "demo"
+  name: "basic"
 spec:
   configuration:
     clusters:
       - name: "cl"
         layout:
           replicasCount: 1
-          shardsCount: 2
+          shardsCount: 1
         templates:
           volumeClaimTemplate: storage
           podTemplate: replica
     zookeeper:
         nodes:
-        - host: zookeeper.zoo1ns
+        - host: keeper-keeper
           port: 2181
   templates:
     podTemplates:

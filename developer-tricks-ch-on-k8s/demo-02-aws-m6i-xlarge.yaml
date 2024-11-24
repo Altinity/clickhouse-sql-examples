@@ -15,7 +15,7 @@ spec:
           podTemplate: replica
     zookeeper:
         nodes:
-        - host: zookeeper.zoo1ns
+        - host: zookeeper
           port: 2181
   templates:
     podTemplates:
