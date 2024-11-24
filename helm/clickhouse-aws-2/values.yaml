@@ -3,10 +3,10 @@
 all:
   metadata:
     labels:
-      application_group: "aws"
+      application_group: "aws-2"
 
 clickhouse:
-  name: aws
+  name: aws-2
   cluster: ch
   zones: 
     - us-west-2a
@@ -15,20 +15,16 @@ clickhouse:
   nodeSelector: m6i.large
   image: "altinity/clickhouse-server:23.8.8.21.altinitystable"
   storage: 50Gi
-  service:
-    type: ClusterIP
 
 keeper:
-  name: aws-keeper
-  cluster: chk
+  name: aws-keeper-2
   zones: 
     - us-west-2a
     - us-west-2b
     - us-west-2c
   nodeSelector: m6i.large
-  replicas: 1
+  replicas: 3
   listen_host: "0.0.0.0"
   tcp_port: 2181
   image: "altinity/clickhouse-keeper:23.8.8.21.altinitystable"
-  #image: "clickhouse/clickhouse-keeper:23.8.10.43-alpine"
   storage: 25Gi

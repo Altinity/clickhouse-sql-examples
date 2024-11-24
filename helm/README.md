@@ -1,7 +1,8 @@
 # Sample Helm charts for ClickHouse and ClickHouse Keeper
 
 The samples in this directory illustrate simple Helm charts that can be 
-used to deploy ClickHouse and ClickHouse Keeper.
+used to deploy ClickHouse and ClickHouse Keeper. *THEY ARE SAMPLES ONLY
+AND NOT GUARANTEED TO WORK. USE OFFICIAL ALTINITY HELM CHARTS INSTEAD.*
 
 We do not make an effort to show everything users can do with Helm. The
 samples provide a starting point for further embroidery. 
@@ -27,6 +28,13 @@ You'll need to do the following to get started.
 ```
 helm repo add clickhouse-operator https://docs.altinity.com/clickhouse-operator/
 helm install clickhouse-operator clickhouse-operator/altinity-clickhouse-operator
+```
+
+* Use helm to install [ClickHouse Keeper](https://github.com/Altinity/kubernetes-blueprints-for-clickhouse/tree/master/helm/keeper-sts). 
+
+```
+helm repo add kubernetes-blueprints https://docs.altinity.com/kubernetes-blueprints-for-clickhouse
+helm install keeper kubernetes-blueprints/keeper-sts
 ```
 
 Please note the Altinity Operator project instructions regarding operator

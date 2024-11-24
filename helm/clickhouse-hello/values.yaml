@@ -17,7 +17,7 @@ clickhouse:
   pod:
     image: "altinity/clickhouse-server:23.8.8.21.altinitystable"
   volume:
-    storage: 50Gi
+    storage: 100Gi
   service:
     # Options are ClusterIP or LoadBalancer. The latter will create an 
     # external load balancer on AWS EKS. 

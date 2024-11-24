@@ -18,8 +18,6 @@ spec:
                 {{- end }}
         templates:
           podTemplate: replica
-          serviceTemplate: service
-          volumeClaimTemplate: storage
     zookeeper:
         nodes:
         - host: "{{ .Values.keeper.name }}"
@@ -53,11 +51,3 @@ spec:
           resources:
             requests:
               storage: "{{ .Values.clickhouse.storage }}"
-    serviceTemplates:
-      - name: service
-        generateName: chendpoint-{chi}
-        metadata:
-          labels:
-            application_group: "{{ .Values.all.metadata.labels.application_group }}"
-        spec:
-          type: "{{ $.Values.clickhouse.service.type }}" 
