@@ -1,0 +1,49 @@
+apiVersion: "clickhouse.altinity.com/v1"
+kind: "ClickHouseInstallation"
+metadata:
+  name: "demo"
+spec:
+  configuration:
+    clusters:
+      - name: "many"
+        layout:
+          replicasCount: 1
+          shardsCount: 1
+        templates:
+          podTemplate: replica-1
+          volumeClaimTemplate: storage
+    users:
+      # Create user 'root' with ability to issue SQL RBAC commands. 
+      # (Password = 'topsecret')
+      root/networks/ip: "::/0"
+      root/password_sha256_hex: 53336a676c64c1396553b2b7c92f38126768827c93b64d9142069c10eda7a721
+      root/profile: "default"
+      root/access_management: 1
+    files:
+      config.d/max_connections.xml: |
+        <clickhouse>
+           <max_concurrent_queries>25</max_concurrent_queries>
+        </clickhouse>
+      config.d/max_parts.xml: |
+        <clickhouse>
+          <merge_tree>
+            <parts_to_throw_insert>25</parts_to_throw_insert>
+          </merge_tree>
+        </clickhouse>
+  templates:
+    podTemplates:
+      - name: replica-1
+        spec:
+          containers:
+          - name: clickhouse
+            image: altinity/clickhouse-server:24.3.5.47.altinitystable
+    volumeClaimTemplates:
+      - name: storage
+        # No need to retain storage. This is a demo. 
+        # reclaimPolicy: Retain
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 20Gi
