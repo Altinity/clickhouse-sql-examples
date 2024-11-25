@@ -1,0 +1,16 @@
+DROP TABLE IF EXISTS test_buffer;
+
+CREATE TABLE test_buffer AS test
+ENGINE = Buffer(
+  kirpi, test, -- Database and table to buffer.
+  1,           -- "Layers" of independent buffers
+  5,           -- Minimum time before flush
+  30,          -- Maximum time ...
+  1000,        -- Minimum rows ...
+  1000000,     -- Maximum rows ...
+  1000000,     -- Minimum bytes ...
+  100000000    -- Maximum bytes ...
+);
+
+INSERT INTO test_buffer 
+  (0,0,'2024-01-01 00:00:01','reading',43.31,'');
