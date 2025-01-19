@@ -1,7 +1,10 @@
 # Iceberg Data Lake Examples
 
-This directory contains samples for construction an Iceberg-based data 
-using Docker Compose. 
+This directory contains samples for construction of an Iceberg-based data 
+lake using Docker Compose. 
+
+The docker compose structure and the Python scripts take inspiration from 
+[ClickHouse integration tests for Iceberg](https://github.com/ClickHouse/ClickHouse/tree/master/tests/integration/test_database_iceberg). 
 
 ## Setup
 
@@ -11,14 +14,10 @@ Install Docker Desktop and Docker Compose.
 
 ### Python
 
-Upgrade Python to 3.12. 
+Install Python virtual environment module for your python version. Example shown
+below. 
 ```
-sudo apt install python3.12 python3.12-venv -y
-```
-
-Install Python virtual environment module for your python version. 
-```
-sudo apt install python3.10-venv
+sudo apt install python3.12-venv
 ```
 
 Create and invoke the venv. 
@@ -39,10 +38,10 @@ pip install pyarrow pyiceberg pandas
 
 ### Bring down the data lake.
 
-Minio loses its data when you do this even though the volumes are
-external. 
+Minio loses its data when you do this. It's best to remove all containers
+to ensure the data is consistent. 
 ```
-./x-up.sh
+./x-down.sh
 ```
 
 ### Cleaning up
@@ -54,7 +53,7 @@ This deletes all containers and volumes for a fresh start.
 
 ## Having fun with Iceberg data. 
 
-First, start docker compose and run ClickHouse locally on your laptop. 
+First, start docker compose using x-up.sh and run ClickHouse locally on your laptop. 
 
 ### Using Python
 
@@ -103,6 +102,9 @@ FROM icebergS3('http://localhost:9002/warehouse/data', 'minio', 'minio123')
 SELECT *
 FROM icebergS3('http://localhost:9002/warehouse/data', 'minio', 'minio123')
 ```
+
+Notice that the path is to your data directory, which has metadata and data
+under it. There will be trouble if it contains more than one table. 
 
 #### Query using the Iceberg REST catalog
 
